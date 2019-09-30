@@ -1,0 +1,116 @@
+# This file specified the keys for converting the station names in PollyNET 
+# Database to the naming conventions for GDAS1 profiles.
+#
+# History:
+#   2019-09-13. First edition by Zhenping
+
+[leipzig]   # name used for GDAS1 profile
+name_PollyNET = ["Leipzig", "Leipzig2", "Leipzig3", "Leipzig4"]
+
+[baengnyeong]
+name_PollyNET = "Baengnyeong"
+
+[kuopio]
+name_PollyNET = "Kuopio"
+
+[Warsaw]
+name_PollyNET = "Warsaw"
+
+[are]
+name_PollyNET = "Are"
+
+[barbados]
+name_PollyNET = "Barbados"
+
+[peking]
+name_PollyNET = "Beijing"
+
+[cabauw]
+name_PollyNET = "Cabauw"
+
+[limassol]
+name_PollyNET = "Cyprus"
+
+[dushanbe]
+name_PollyNET = "Dushanbe"
+
+[elandsfontein]
+name_PollyNET = "Elandsfontein"
+
+[evora]
+name_PollyNET = "Evora"
+
+[finokalia]
+name_PollyNET = "Finokalia"
+
+[helsinki]
+name_PollyNET = "Helsinki"
+
+[hyytiala]
+name_PollyNET = "Hyytiala"
+
+[krauthausen]
+name_PollyNET = "Krauthausen"
+
+[manaus]
+name_PollyNET = "Manaus"
+
+[melpitz]
+name_PollyNET = "Melpitz"
+
+[meteor]
+name_PollyNET = "Meteor"
+
+[new_delhi]
+name_PollyNET = "New Delhi"
+
+[polarstern]
+name_PollyNET = "Polarstern"
+
+[prd]
+name_PollyNET = "PRD"
+
+[punta_arenas]
+name_PollyNET = "Punta_Arenas"
+
+[stellenbosch]
+name_PollyNET = "Stellenbosch"
+
+[stockholm]
+name_PollyNET = "Stockholm"
+
+[athens]
+name_PollyNET = "Athens"
+
+[lindenberg]
+name_PollyNET = "Lindenberg"
+
+[pallas]
+name_PollyNET = "Pallas"
+
+[hpb]
+name_PollyNET = "HPB"
+
+[haifa]
+name_PollyNET = "Haifa"
+
+[karlsruhe]
+name_PollyNET = "Karlsruhe"
+
+[arctic]
+name_PollyNET = "Arctic"
+
+[kosetice]
+name_PollyNET = "Kosetice"
+
+[uae]
+name_PollyNET = "UAE"
+
+[antikythera]
+name_PollyNET = "Antikythera"
+
+[davos]
+name_PollyNET = "Davos"
+
+[tel-aviv]
+name_PollyNET = "Tel_Aviv"

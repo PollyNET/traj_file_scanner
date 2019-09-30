@@ -1,0 +1,5 @@
+trajectory_results/
+log/
+.vscode/
+db/
+*log
