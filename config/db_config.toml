@@ -3,7 +3,7 @@
 # History
 #   2019-09-29. First edition by Zhenping
 
-db_path = "/pollyhome/Picasso/trajectory_results/trajectory_scanner/db"
+db_path = "/pollyhome/Picasso/trajectory_results/traj_file_scanner/db"
 db_filename = 'picasso_traj.db'
 table_name = 'trajectory_figs'
 

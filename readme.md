@@ -2,6 +2,43 @@
 
 The repo helps to scan the trajectory figures to a local [**SQLite3**](https://www.sqlitetutorial.net/) database. Thus make it convenient for Python Developers to extract the data and setup the **done_filelist.txt**. The latter is necessary for adding data into the new Polly Database.
 
+## Download
+
+```text
+git clone https://github.com/ZPYin/traj_file_scanner.git
+```
+
+or click [here](https://github.com/ZPYin/traj_file_scanner/archive/master.zip) for direct download.
+
+## Usage
+
+### setup a new virtual environment
+
+```text
+conda create -n traj_scanner
+activate traj_scanner   # windows
+source activate traj_scanner   # linux
+```
+
+### install the dependencies
+
+```text
+cd traj_file_scanner
+conda install python=3.6
+pip install -r requirements.txt
+```
+
+### configurations
+
+You may only need to configure the [`TRAJECTORY_ROOT`](./config/scanner_config.toml) and [`db_path`](./config/db_config.toml), according to your own demands.
+
+### Run the code
+
+```
+cd src
+python trajectory_scanner.py
+```
+
 ## Database structure
 
 ![database_overview](./img/database_screenshot.png)

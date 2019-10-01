@@ -594,7 +594,7 @@ def main():
 
     scanner = TrajScanner()
 
-    # scanner.db_create_table()
+    scanner.db_create_table()
 
     # the elapse_time can be control to load all the previous results with
     # being set with a extremely large number, let's say 100000
