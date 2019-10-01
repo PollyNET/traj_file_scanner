@@ -4,7 +4,7 @@
 #   2019-09-30. First edition by Zhenping
 
 LOGMODE = 'DEBUG'
-TRAJECTORY_ROOT = 'C:\\Users\\zhenping\\Desktop\\trajectory_scanner\\trajectory_results\\'
+TRAJECTORY_ROOT = '/pollyhome/Picasso/trajectory_results'
 STATION_NAME_FILE = 'station_name_lookup_table.toml'
 DB_CONFIG_FILE = 'db_config.toml'
 INTERVAL_TRAJ_FIG = "05:59:59"   # temporal interval for single trajectory figure. (HH:MM:SS)

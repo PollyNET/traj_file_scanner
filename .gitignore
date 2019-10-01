@@ -2,4 +2,4 @@ trajectory_results/
 log/
 .vscode/
 db/
-*log
+src/__pycache__/

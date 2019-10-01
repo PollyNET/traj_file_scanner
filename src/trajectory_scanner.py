@@ -19,6 +19,7 @@ configFullPath = os.path.join(PROJECTDIR, 'config', SCANNER_CONFIG_FILE)
 with open(configFullPath, 'r', encoding='utf-8') as fh:
     config = toml.loads(fh.read())
 
+# define the logger for producing the logs
 logger = logger_init(
     datetime.datetime.now(),
     os.path.join(PROJECTDIR, 'log'),
@@ -28,10 +29,14 @@ logger = logger_init(
 
 
 class TrajScanner(object):
+    """
+    Trajectory results scanner to scan the folder and add the results to
+    sqlite3 database.
+    """
 
     def __init__(self):
         """
-        initialize the sqlite3 database
+        initialize the sqlite3 database.
         """
 
         # load configuration
@@ -53,14 +58,12 @@ class TrajScanner(object):
             conn = sqlite3.connect(db_file)
             logger.info(sqlite3.version)
             logger.info(
-                            'Successfully create the database:\n{}'.
+                            'Successfully conect to the database:\n{}'.
                             format(db_file)
                         )
         except Error as e:
             logger.warn(e)
-        finally:
-            if conn:
-                conn.close()
+            raise e
 
         self.conn = conn
 
@@ -76,8 +79,7 @@ class TrajScanner(object):
         try:
             c = self.conn.cursor()
             c.execute(
-                self.db_config['sql_query']['create_traj_table'],
-                (self.db_config['table_name'])
+                self.db_config['sql_query']['create_traj_table']
             )
             self.conn.commit()
 
@@ -90,23 +92,52 @@ class TrajScanner(object):
 
     def db_insert_entry(self, entry):
         """
-        insert data into the database
+        insert data into the database.
 
         Parameters
         ----------
         entry: tuple
+            imgpath: str
+            full path of the trajectory results.
+
+            category: int
+            category of the trajectory results.
+            (details can be found in readme.md)
+
+            pollynet_station: str
+            pollynet station name associated with the trajectories.
+
+            gdas1_station: str
+            GDAS1 station name associated with the trajectories.
+
+            ending_height: float
+            ending height for the trajectories.
+            (details can be found in readme.md)
+
+            start_time: datetime obj
+            start time of the results.
+
+            stop_time: datetime obj
+            stop time of the results.
+
+            upload_time: datetime obj
+            uploading time of the results.
+
+        History
+        -------
+        2019-10-01. First edition by Zhenping.
         """
+
         if type(entry) is dict:
             entry = [entry]
 
         for item in entry:
-            single_entry_tuple = tuple(
-                self.db_config['name'],
-                item['filename'],
+            single_entry_tuple = (
+                item['imgpath'],
                 item['category'],
                 item['pollynet_station'],
                 item['gdas1_station'],
-                item['path'],
+                item['ending_height'],
                 item['start_time'].strftime('%Y-%m-%d %H:%M:%S'),
                 item['stop_time'].strftime('%Y-%m-%d %H:%M:%S'),
                 item['upload_time'].strftime('%Y-%m-%d %H:%M:%S'),
@@ -122,25 +153,65 @@ class TrajScanner(object):
 
             except Error as e:
                 logger.error(e)
-                return False
+                logger.info(single_entry_tuple[0])
+
+        return True
+
+    def db_drop_table(self):
+        """
+        delete the table.
+        """
+
+        if self.conn is None:
+            logger.warn('database does not exist.')
+            return False
+
+        try:
+            c = self.conn.cursor()
+            c.execute(
+                self.db_config['sql_query']['drop_traj_table']
+            )
+            self.conn.commit()
+
+            logger.info('Delete the table successfully.')
+        except Error as e:
+            logger.error(e)
+            return False
 
         return True
 
     def db_delete_entry(self, entry_dict):
         """
-        delete entry
+        delete entry.
+
+        Parameters
+        ----------
+        entry_dict: dict
+            filename: str
+            filename of the trajectory results.
+
+            pollynet_station: str
+            pollynet station name.
+
+        History
+        -------
+        2019-10-01. First edition by Zhenping
         """
+
         try:
             c = self.conn.cursor()
             c.execute(
                         self.db_config['sql_query']['delete_entry'],
                         (
-                            self.db_config['table_name'],
-                            entry_dict['filename'],
+                            entry_dict['imgpath'],
                             entry_dict['pollynet_station']
                         )
                     )
             self.conn.commit()
+            logger.info(
+                'Delete the entries with the searching arguments {}'.
+                format(str(entry_dict))
+                )
 
             c.close()
         except Error as e:
@@ -150,25 +221,46 @@ class TrajScanner(object):
         return True
 
     def db_close(self,):
+        """
+        close the database.
+        """
         self.conn.close()
 
-    def scan_traj_files(
-        self,
-        start_time,
-        elapse_time=datetime.timedelta(days=30)
-    ):
+    def scan_traj_files(self, start_time,
+                        elapse_time=datetime.timedelta(days=30)):
         """
         scan the trajectory figures.
+
+        Parameters
+        ----------
+        start_time: datetime obj
+        start time of the searching.
+
+        Keywords
+        --------
+        elapse_time: timedelta obj
+        the searching limit away from the start time.
+
+        Returns
+        -------
+        figInfoList: dict
+            filename: str
+            path: str
+            station: str
+
+        History
+        -------
+        2019-10-01. First edition by Zhenping
         """
         fileList = []
-        stationList = os.listdir(config['TRAJECTORY_ROOT'])
+        stationList = list(self.station_name_table.keys())
 
         dateList = [start_time - datetime.timedelta(days=iDay)
                     for iDay in range(
                         0,
-                        elapse_time / datetime.timedelta(days=1)
+                        int(elapse_time / datetime.timedelta(days=1) + 1)
                                      )]
-        for thisDate in datetime:
+        for thisDate in dateList:
             for station in stationList:
                 trjPath = os.path.join(
                     config['TRAJECTORY_ROOT'],
@@ -186,27 +278,50 @@ class TrajScanner(object):
                         'station': station
                     }
 
-                    fileList.append(figInfo)
+                    fileList.append(figInfo.copy())
+
+        return fileList
 
     def setup_insert_entries(self, figInfoList):
         """
         convert the figure metadata to database entry.
+
+        Parameters
+        ----------
+        figInfoList: list
+        each single element is the info for each single trajectory plot.
+
+        Returns
+        -------
+        entryList: list
+        each single element is the entry that will be directly inserted into
+        the databasse.
+
+        History
+        -------
+        2019-10-01. First edition by Zhenping
         """
 
         entryList = []
         entry = {}
 
         for figInfo in figInfoList:
-            for pollynetStation in self.station_name_table[figInfo['station']]:
-                entry['filename'] = figInfo['filename']
+            pollynetStationNameList = \
+                (self.station_name_table[figInfo['station']]['name_PollyNET'])
+            for pollynetStation in pollynetStationNameList:
+                entry['imgpath'] = os.path.join(
+                    figInfo['path'],
+                    figInfo['filename']
+                )
                 entry['category'] = figInfo['category']
                 entry['pollynet_station'] = pollynetStation
                 entry['gdas1_station'] = figInfo['station']
-                entry['path'] = figInfo['path']
+                entry['ending_height'] = figInfo['ending_height']
                 entry['start_time'] = figInfo['start_time']
                 entry['stop_time'] = figInfo['stop_time']
+                entry['upload_time'] = figInfo['upload_time']
 
-                entryList.append(entry)
+                entryList.append(entry.copy())
 
         return entryList
 
@@ -217,6 +332,11 @@ class TrajScanner(object):
         Parameters
         ----------
         fileList: list
+        each single element is the info for each single trajectory plot, it has
+        the variables below:
+            filename: str
+            path: str
+            station: str
 
         Returns
         -------
@@ -229,6 +349,17 @@ class TrajScanner(object):
 
         figInfoList = []
         figInfo = {}
+
+        # convert timedelta string to timedelta object
+        dtObj = datetime.datetime.strptime(
+            config['INTERVAL_TRAJ_FIG'],
+            '%H:%M:%S'
+            )
+        tdObj = datetime.timedelta(
+            hours=dtObj.hour,
+            minutes=dtObj.minute,
+            seconds=dtObj.second
+            )
 
         traj_prof_pat = re.compile(
             "(?P<date>\d{8})_(?P<hour>\d{2})_(?P<height>\d{5})" +
@@ -261,10 +392,10 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = res.group('height')
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
-                figInfo['stop_time'] = figInfo['start_time'] + \
-                    config['INTERVAL_TRAJ_FIG']
+                figInfo['stop_time'] = figInfo['start_time'] + tdObj
                 figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
                     os.path.getmtime(
                         os.path.join(item['path'], item['filename'])
@@ -280,10 +411,15 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = res.group('height')
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
-                figInfo['stop_time'] = figInfo['start_time'] + \
-                    config['INTERVAL_TRAJ_FIG']
+                figInfo['stop_time'] = figInfo['start_time'] + tdObj
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 9
 
@@ -294,10 +430,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 5
 
@@ -308,10 +450,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 6
 
@@ -322,10 +470,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 7
 
@@ -336,10 +490,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 8
 
@@ -350,10 +510,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 1
 
@@ -364,10 +530,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 2
 
@@ -378,10 +550,16 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 3
 
@@ -392,21 +570,45 @@ class TrajScanner(object):
                 figInfo['filename'] = item['filename']
                 figInfo['path'] = item['path']
                 figInfo['station'] = item['station']
+                figInfo['ending_height'] = 0
                 figInfo['start_time'] = datetime.datetime.strptime(
                     res.group('date'), '%Y%m%d')
                 figInfo['stop_time'] = figInfo['start_time'] + \
                     datetime.timedelta(hours=23, minutes=59, seconds=59)
+                figInfo['upload_time'] = datetime.datetime.utcfromtimestamp(
+                    os.path.getmtime(
+                        os.path.join(item['path'], item['filename'])
+                    )
+                )
                 # The category table can be found in readme.md
                 figInfo['category'] = 4
 
-            figInfoList.append(figInfo)
+            figInfoList.append(figInfo.copy())
 
         return figInfoList
 
 
 def main():
+
+    logger.info('Start to scan the backward trajectory results...')
+
     scanner = TrajScanner()
-    scanner.db_create_table()
+
+    # scanner.db_create_table()
+
+    # the elapse_time can be control to load all the previous results with
+    # being set with a extremely large number, let's say 100000
+    fileList = scanner.scan_traj_files(datetime.datetime.now(),
+                                       elapse_time=datetime.timedelta(days=30))
+
+    fileInfoList = scanner.parse_traj_file(fileList)
+
+    entryList = scanner.setup_insert_entries(fileInfoList)
+
+    scanner.db_insert_entry(entryList)
+
+    scanner.db_close()
+
 
 if __name__ == "__main__":
     main()

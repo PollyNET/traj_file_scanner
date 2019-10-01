@@ -8,109 +8,109 @@
 name_PollyNET = ["Leipzig", "Leipzig2", "Leipzig3", "Leipzig4"]
 
 [baengnyeong]
-name_PollyNET = "Baengnyeong"
+name_PollyNET = ["Baengnyeong"]
 
 [kuopio]
-name_PollyNET = "Kuopio"
+name_PollyNET = ["Kuopio"]
 
-[Warsaw]
-name_PollyNET = "Warsaw"
+[warsaw]
+name_PollyNET = ["Warsaw"]
 
 [are]
-name_PollyNET = "Are"
+name_PollyNET = ["Are"]
 
 [barbados]
-name_PollyNET = "Barbados"
+name_PollyNET = ["Barbados"]
 
 [peking]
-name_PollyNET = "Beijing"
+name_PollyNET = ["Beijing"]
 
 [cabauw]
-name_PollyNET = "Cabauw"
+name_PollyNET = ["Cabauw"]
 
 [limassol]
-name_PollyNET = "Cyprus"
+name_PollyNET = ["Cyprus"]
 
 [dushanbe]
-name_PollyNET = "Dushanbe"
+name_PollyNET = ["Dushanbe"]
 
 [elandsfontein]
-name_PollyNET = "Elandsfontein"
+name_PollyNET = ["Elandsfontein"]
 
 [evora]
-name_PollyNET = "Evora"
+name_PollyNET = ["Evora"]
 
 [finokalia]
-name_PollyNET = "Finokalia"
+name_PollyNET = ["Finokalia"]
 
 [helsinki]
-name_PollyNET = "Helsinki"
+name_PollyNET = ["Helsinki"]
 
 [hyytiala]
-name_PollyNET = "Hyytiala"
+name_PollyNET = ["Hyytiala"]
 
 [krauthausen]
-name_PollyNET = "Krauthausen"
+name_PollyNET = ["Krauthausen"]
 
 [manaus]
-name_PollyNET = "Manaus"
+name_PollyNET = ["Manaus"]
 
 [melpitz]
-name_PollyNET = "Melpitz"
+name_PollyNET = ["Melpitz"]
 
 [meteor]
-name_PollyNET = "Meteor"
+name_PollyNET = ["Meteor"]
 
 [new_delhi]
-name_PollyNET = "New Delhi"
+name_PollyNET = ["New Delhi"]
 
 [polarstern]
-name_PollyNET = "Polarstern"
+name_PollyNET = ["Polarstern"]
 
 [prd]
-name_PollyNET = "PRD"
+name_PollyNET = ["PRD"]
 
 [punta_arenas]
-name_PollyNET = "Punta_Arenas"
+name_PollyNET = ["Punta_Arenas"]
 
 [stellenbosch]
-name_PollyNET = "Stellenbosch"
+name_PollyNET = ["Stellenbosch"]
 
 [stockholm]
-name_PollyNET = "Stockholm"
+name_PollyNET = ["Stockholm"]
 
 [athens]
-name_PollyNET = "Athens"
+name_PollyNET = ["Athens"]
 
 [lindenberg]
-name_PollyNET = "Lindenberg"
+name_PollyNET = ["Lindenberg"]
 
 [pallas]
-name_PollyNET = "Pallas"
+name_PollyNET = ["Pallas"]
 
 [hpb]
-name_PollyNET = "HPB"
+name_PollyNET = ["HPB"]
 
 [haifa]
-name_PollyNET = "Haifa"
+name_PollyNET = ["Haifa"]
 
 [karlsruhe]
-name_PollyNET = "Karlsruhe"
+name_PollyNET = ["Karlsruhe"]
 
 [arctic]
-name_PollyNET = "Arctic"
+name_PollyNET = ["Arctic"]
 
 [kosetice]
-name_PollyNET = "Kosetice"
+name_PollyNET = ["Kosetice"]
 
 [uae]
-name_PollyNET = "UAE"
+name_PollyNET = ["UAE"]
 
 [antikythera]
-name_PollyNET = "Antikythera"
+name_PollyNET = ["Antikythera"]
 
 [davos]
-name_PollyNET = "Davos"
+name_PollyNET = ["Davos"]
 
 [tel-aviv]
-name_PollyNET = "Tel_Aviv"
+name_PollyNET = ["Tel_Aviv"]

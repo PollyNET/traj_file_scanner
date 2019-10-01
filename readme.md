@@ -1,24 +1,29 @@
 # Trajectory files Scanner for Picasso
 
+The repo helps to scan the trajectory figures to a local [**SQLite3**](https://www.sqlitetutorial.net/) database. Thus make it convenient for Python Developers to extract the data and setup the **done_filelist.txt**. The latter is necessary for adding data into the new Polly Database.
+
 ## Database structure
 
-|ID|filename|category|pollynet_station|gdas1_station|path|start_time|stop_time|upload_time|insert_time|
-|:-:|:-----:|:---:|:---:|:----:|:----|:---|:---:|:---:|:---:|
-|1|20190913_tel-aviv_multi-geonames-abs-region-ens-below2.0km.png|1|tel-aviv|tel-aviv|/cygdrive/c/Users/zhenping/Desktop/trajectory_scanner|2019-09-13 00:00:00|2019-09-13 23:59:59|2019-09-15 04:00:00|2019-09-15 06:00:00|
+![database_overview](./img/database_screenshot.png)
 
-### ID
+### Database table
 
-auto-increment from 1
-INT
+![Tabel](./img/database_table.png)
 
-### filename
+**ID**
 
-filename of the figure
-varchar
+- auto-increment from 1
+- [INT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### category
+**imgpath**
 
-product type
+- fullpath of the figure
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
+
+**category**
+
+- product type
+
 |value|            type                 |
 |:---:|:--------------------------------|
 |1    |geonames-abs-regions-ens-below2.0|
@@ -32,41 +37,46 @@ product type
 |9    |trajectories_map                 |
 |10   |trajectories_prof                |
 
-INT
+- [INT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### pollynet_station
+**pollynet_station**
 
-pollynet station name
-varchar
+- PollyNET station name
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### gdas1_station
+**gdas1_station**
 
-gdas1 station name
-varchar
+- gdas1 station name
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-Note: this name is unique and it can be projected to multiple pollynet station name. The lookup table can be found in [name_lookup_table](config\station_name_lookup_table.toml).
+Note: this name is unique and it can be projected to multiple PollyNET station name. The lookup table can be found in [name_lookup_table](./config/station_name_lookup_table.toml).
 
-### path
+**ending_height**
 
-root dir of the figures
-varchar
+- ending height of the trajectories.
+- [REAL](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### start_time
+**start_time**
 
-start time of the figure
-datetime
+- start time of the figure
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### stop_time
+**stop_time**
 
-stop time of the figure
-datetime
+- stop time of the figure
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### upload_time
+**upload_time**
 
-upload time of the figure
-datetime
+- upload time of the figure
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
 
-### insert_time
+**insert_time**
 
-insert time of the entry
-datetime
+- insert time of the entry
+- [TEXT](https://www.sqlitetutorial.net/sqlite-data-types/)
+
+## Contact
+
+- Zhenping
+- zhenping@tropos.de

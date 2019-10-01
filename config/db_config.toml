@@ -3,29 +3,33 @@
 # History
 #   2019-09-29. First edition by Zhenping
 
-db_path = "C:\\Users\\zhenping\\Desktop\\trajectory_scanner\\db\\"
+db_path = "/pollyhome/Picasso/trajectory_results/trajectory_scanner/db"
 db_filename = 'picasso_traj.db'
 table_name = 'trajectory_figs'
 
 ['sql_query']
 create_traj_table = """
-CREATE TABLE IF NOT EXISTS ? (
+CREATE TABLE IF NOT EXISTS trajectory_figs (
     id integer PRIMARY KEY,
-    filename text NOT NULL,
+    imgpath TEXT NOT NULL,
     category INT,
-    pollynet_station text,
-    gdas1_station text,
-    path text,
-    start_time text,
-    stop_time text,
-    upload_time text,
-    insert_time text
+    pollynet_station TEXT,
+    gdas1_station TEXT,
+    ending_height REAL,
+    start_time TEXT,
+    stop_time TEXT,
+    upload_time TEXT,
+    insert_time TEXT,
+    unique (imgpath)
 );
 """
+drop_traj_table = """
+drop table trajectory_figs;
+"""
 insert_traj_entry = """
-INSERT INTO ?(filename,category,pollynet_station,gdas1_station,path,start_time,stop_time,upload_time,insert_time)
-VALUES(?,?,?,?,?,?,?,?,?)
+INSERT INTO trajectory_figs(imgpath,category,pollynet_station,gdas1_station,ending_height,start_time,stop_time,upload_time,insert_time)
+VALUES(?,?,?,?,?,?,?,?,?);
 """
 delete_entry = """
-DELETE FROM ? WHERE filename=? AND pollynet_station=?
+DELETE FROM trajectory_figs WHERE imgpath=? AND pollynet_station=?;
 """

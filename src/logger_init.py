@@ -36,7 +36,7 @@ def logger_init(time, folder, *args, force=False, mode='INFO'):
     logger = logging.getLogger(__name__)
     logger.setLevel(logModeDict[mode])
 
-    fh = logging.FileHandler(logfile)
+    fh = logging.FileHandler(logFullpath)
     fh.setLevel(logModeDict[mode])
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logModeDict[mode])
