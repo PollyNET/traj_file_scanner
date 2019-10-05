@@ -368,21 +368,21 @@ class TrajScanner(object):
             "(?P<date>\d{8})_(?P<hour>\d{2})_(?P<height>\d{5})" +
             "_trajectories_map.png")
         traj_geonames_20_pat = re.compile(
-            "(?P<date>\d{8})_.*_geonames-abs-region-ens-below2.0km.png")
+            "(?P<date>\d{8})_.*-geonames-abs-region-ens-below2.0km.png")
         traj_geonames_50_pat = re.compile(
-            "(?P<date>\d{8})_.*_geonames-abs-region-ens-below5.0km.png")
+            "(?P<date>\d{8})_.*-geonames-abs-region-ens-below5.0km.png")
         traj_geonames_80_pat = re.compile(
-            "(?P<date>\d{8})_.*_geonames-abs-region-ens-below8.0km.png")
+            "(?P<date>\d{8})_.*-geonames-abs-region-ens-below8.0km.png")
         traj_geonames_md_pat = re.compile(
-            "(?P<date>\d{8})_.*_geonames-abs-region-ens-belowmd.png")
+            "(?P<date>\d{8})_.*-geonames-abs-region-ens-belowmd.png")
         traj_region_land_20_pat = re.compile(
-            "(?P<date>\d{8})_.*_land-use-abs-occ-ens-below2.0km.png")
+            "(?P<date>\d{8})_.*-land-use-abs-occ-ens-below2.0km.png")
         traj_region_land_50_pat = re.compile(
-            "(?P<date>\d{8})_.*_land-use-abs-occ-ens-below5.0km.png")
+            "(?P<date>\d{8})_.*-land-use-abs-occ-ens-below5.0km.png")
         traj_region_land_80_pat = re.compile(
-            "(?P<date>\d{8})_.*_land-use-abs-occ-ens-below8.0km.png")
+            "(?P<date>\d{8})_.*-land-use-abs-occ-ens-below8.0km.png")
         traj_region_land_md_pat = re.compile(
-            "(?P<date>\d{8})_.*_land-use-abs-occ-ens-belowmd.png")
+            "(?P<date>\d{8})_.*-land-use-abs-occ-ens-belowmd.png")
 
         for item in fileList:
             if traj_prof_pat.match(item['filename']):
