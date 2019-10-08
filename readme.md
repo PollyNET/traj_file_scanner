@@ -1,6 +1,6 @@
-# Trajectory files Scanner for Picasso
+# Trajectory files Scanner for Picasso (only for internal usage)
 
-The repo helps to scan the trajectory figures to a local [**SQLite3**](https://www.sqlitetutorial.net/) database. Thus make it convenient for Python Developers to extract the data and setup the **done_filelist.txt**. The latter is necessary for adding data into the new Polly Database.
+The repo helps to scan the trajectory figures to a local [**SQLite3**](https://www.sqlitetutorial.net/) database. In addtion, it can help create the **done_filelist.txt** for trajectory figures, which is essential for appending the trajectory figures into the **PollyNET** database.
 
 ## Download
 
@@ -30,7 +30,11 @@ pip install -r requirements.txt
 
 ### configurations
 
-You may only need to configure the [`TRAJECTORY_ROOT`](./config/scanner_config.toml) and [`db_path`](./config/db_config.toml), according to your own demands.
+**setup done_filelist**
+You need to configure the [`TRAJECTORY_ROOT`](./config/scanner_config.toml) [`POLLYAPP_CONFIG_FILE`](./config/scanner_config.toml) and [`DONE_FILELIST`](./config/scanner_config.toml), according to your own demands.
+
+**scan into SQLite3 DB**
+You need to configure the [`TRAJECTORY_ROOT`](./config/scanner_config.toml) and [`db_path`](./config/db_config.toml).
 
 ### Run the code
 
@@ -39,13 +43,21 @@ cd src
 python trajectory_scanner.py
 ```
 
-## Database structure
+    The command line interface is not setup for the script. Therefore, you may need to comment and uncommet the code in the `main` function to control the functionality.
+
+## SQLite3 Database
+
+### Database overview
+
+**structure**
 
 ![database_overview](./img/database_screenshot.png)
 
-### Database table
+**table**
 
 ![Tabel](./img/database_table.png)
+
+### Database Columns
 
 **ID**
 

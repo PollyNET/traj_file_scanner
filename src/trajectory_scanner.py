@@ -824,8 +824,10 @@ def make_done_filelist_4_traj():
 
 def main():
 
+    # scan the trajectory plots to a local SQLite3 Database
     # scan_traj_into_sqliteDB()
 
+    # scan the trajectory plots and save it to done_filelist.txt
     make_done_filelist_4_traj()
 
 

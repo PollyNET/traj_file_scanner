@@ -3,3 +3,4 @@ log/
 .vscode/
 db/
 src/__pycache__
+config/*.toml
