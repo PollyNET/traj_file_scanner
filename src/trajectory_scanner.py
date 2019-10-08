@@ -764,7 +764,7 @@ def setup_done_filelist(file, pollyDB_entryList):
     2019-10-08. First edition by Zhenping.
     """
 
-    with open(file, 'w', encoding='utf-8') as fh:
+    with open(file, 'a', encoding='utf-8') as fh:
         for entry in pollyDB_entryList:
             logger.info('write {image}, {loc}, {polly} to the done_filelist'.
                         format(
