@@ -43,7 +43,9 @@ cd src
 python trajectory_scanner.py
 ```
 
-    The command line interface is not setup for the script. Therefore, you may need to comment and uncommet the code in the `main` function to control the functionality.
+**Note**
+
+The command line interface is not setup for the script. Therefore, you may need to comment and uncommet the code in the `main` function to control the functionality.
 
 ## SQLite3 Database
 
