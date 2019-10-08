@@ -697,17 +697,30 @@ def convert_to_pollyDB_entry(entryList):
 
         # find the polly, nc_zip_file and some other info from the polly
         # database
-        c.execute("""select l.name, loc.name, ld.starttime, ld.stoptime,
-                            ld.nc_zip_file, ld.nc_zip_file_size, l.active,
-                            ld.gdas, ld.gdas_timestamp, ld.software_version
-                     from lidar_data ld inner join lidar l
-                          inner join location loc
-                     where (loc.name = %s) and
-                           (ld.starttime >= %s) and
-                           (ld.stoptime <= %s) and
-                           (l.location_fk = loc.id) and
-                           (ld.location_fk = loc.id) and
-                           (ld.lidar_fk = l.id);""", (
+        c.execute("""SELECT
+                        l.name,
+                        loc.name,
+                        ld.starttime,
+                        ld.stoptime,
+                        ld.nc_zip_file,
+                        ld.nc_zip_file_size,
+                        l.active,
+                        ld.gdas,
+                        ld.gdas_timestamp,
+                        ld.software_version
+                     FROM
+                        lidar_data ld
+                            INNER JOIN
+                        lidar l
+                            INNER JOIN
+                        location loc
+                     WHERE
+                        (loc.name = %s) AND
+                        (ld.starttime >= %s) AND
+                        (ld.stoptime <= %s) AND
+                        (l.location_fk = loc.id) AND
+                        (ld.location_fk = loc.id) AND
+                        (ld.lidar_fk = l.id);""", (
                         entry['pollynet_station'],
                         entry['start_time'].strftime('%Y-%m-%d %H:%M:%S'),
                         entry['stop_time'].strftime('%Y-%m-%d %H:%M:%S')
@@ -725,7 +738,9 @@ def convert_to_pollyDB_entry(entryList):
                 'last_update':
                     datetime.datetime.now().strftime('%Y%m%d %H:%M:%S'),
                 'lambda': '355',
-                'image': entry['imgpath'],
+                'image': os.path.relpath(
+                    entry['imgpath'],
+                    config['TRAJECTORY_ROOT']),
                 'level': '0',
                 'info': 'ensemble trajectory plot that was reanalysed ' +
                         'from HYSPLIT outputs',
