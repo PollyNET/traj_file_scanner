@@ -720,10 +720,10 @@ def convert_to_pollyDB_entry(entryList):
             pollyDB_entry = {
                 'lidar': item[0],
                 'location': item[1],
-                'starttime': item[2],
-                'stoptime': item[3],
+                'starttime': item[2].strftime('%Y%m%d %H:%M:%S'),
+                'stoptime': item[3].strftime('%Y%m%d %H:%M:%S'),
                 'last_update':
-                    datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    datetime.datetime.now().strftime('%Y%m%d %H:%M:%S'),
                 'lambda': '355',
                 'image': entry['imgpath'],
                 'level': '0',
@@ -737,8 +737,10 @@ def convert_to_pollyDB_entry(entryList):
                 'lidar_ratio': '50',
                 'software_version': item[9],
                 'product_type': product_type,
-                'product_starttime': entry['start_time'],
-                'product_stoptime': entry['stop_time']
+                'product_starttime':
+                    entry['start_time'].strftime('%Y%m%d %H:%M:%S'),
+                'product_stoptime':
+                    entry['stop_time'].strftime('%Y%m%d %H:%M:%S')
             }
 
             pollyDB_entryList.append(pollyDB_entry)
