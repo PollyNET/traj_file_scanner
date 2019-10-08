@@ -3,6 +3,7 @@ import sys
 import datetime
 import toml
 import sqlite3
+import MySQLdb
 import glob
 import re
 from sqlite3 import Error
@@ -48,6 +49,11 @@ class TrajScanner(object):
             PROJECTDIR, 'config', config['STATION_NAME_FILE'])
         with open(lookupTFile, 'r', encoding='utf-8') as fh:
             self.station_name_table = toml.loads(fh.read())
+
+    def db_connect(self):
+        """
+        Connect/create the SQLite3 database.
+        """
 
         conn = None
         try:
@@ -588,11 +594,199 @@ class TrajScanner(object):
         return figInfoList
 
 
-def main():
+def convert_to_pollyDB_entry(entryList):
+    """
+    convert the entry list to pollyDB done_filelist entry.
+
+    Parameters
+    ----------
+    entryList: list of entries, which have the elements below.
+        imgpath: str
+        full path of the trajectory results.
+
+        category: int
+        category of the trajectory results.
+        (details can be found in readme.md)
+
+        pollynet_station: str
+        pollynet station name associated with the trajectories.
+
+        gdas1_station: str
+        GDAS1 station name associated with the trajectories.
+
+        ending_height: float
+        ending height for the trajectories.
+        (details can be found in readme.md)
+
+        start_time: datetime obj
+        start time of the results.
+
+        stop_time: datetime obj
+        stop time of the results.
+
+        upload_time: datetime obj
+        uploading time of the results.
+
+    Returns
+    -------
+    pollyDB_entryList: list of pollyDB entries, which have the elements below
+        |name             |example                                   |
+        |:---------------:|:-----------------------------------------|
+        |lidar            |PollyXT_CGE                               |
+        |location         |Evora                                     |
+        |starttime        |20190926 00:00:00                         |
+        |stoptime         |20190926 05:57:00                         |
+        |last_update      |20190930 20:35:07                         |
+        |lambda           |355                                       |
+        |image            |PollyXT_CGE/2019/09/26/SIG.png            |
+        |level            |0                                         |
+        |info             |Meteorological data from GDAS1 at evora   |
+        |nc_zip_file      |201909/2019_09_26_Thursday_00_00_10.nc.zip|
+        |nc_zip_file_size |3036106                                   |
+        |active           |1                                         |
+        |GDAS             |1                                         |
+        |GDAS_timestamp   |20190926 00:00:00                         |
+        |lidar_ratio      |50                                        |
+        |software_version |1.3                                       |
+        |product_type     |SIG                                       |
+        |product_starttime|20190926 00:00:00                         |
+        |product_stoptime |20190926 00:59:30                         |
+
+    History
+    -------
+    2019-10-08. First edition by Zhenping.
+    """
+
+    if type(entryList) is dict:
+        # convert dict to list
+        entryList = [entryList]
+
+    # load the pollyAPP configuration
+    with open(config['POLLYAPP_CONFIG_FILE'], 'r', encoding='utf-8') as fh:
+        POLLYAPP_CONFIG = toml.loads(fh.read())
+
+    # connect to the polly database
+    # -> if you do it locally, you need to project the remote port to your
+    # localhost. Use the command below:
+    # ssh -f Picasso@rsd.tropos.de -L 7800:localhost:3306 -N
+    try:
+        con = MySQLdb.connect(
+            host=POLLYAPP_CONFIG['DATABASE_HOST'],
+            port=int(POLLYAPP_CONFIG['DATABASE_PORT']),
+            user=POLLYAPP_CONFIG['DATABASE_USER'],
+            passwd=POLLYAPP_CONFIG['DATABASE_PASSWORD'],
+            db=POLLYAPP_CONFIG['DATABASE_NAME']
+        )
+        c = con.cursor()
+    except Exception as e:
+        logger.error('Failure in connecting the polly database')
+        raise ConnectionError
+
+    pollyDB_entryList = []
+    for entry in entryList:
+
+        # determine whether the entry contains the figures of
+        # 1: geonames-abs-regions-ens-below2.0
+        # 5: land-use-occ-ens-below2.0
+        if (not entry['category'] == 1) and (not entry['category'] == 5):
+            continue
+        elif entry['category'] == 1:
+            product_type = 'airmass_origin_geo'
+        elif entry['category'] == 5:
+            product_type = 'airmass_origin_landuse'
+
+        # find the polly, nc_zip_file and some other info from the polly
+        # database
+        c.execute("""select l.name, loc.name, ld.starttime, ld.stoptime,
+                            ld.nc_zip_file, ld.nc_zip_file_size, l.active,
+                            ld.gdas, ld.gdas_timestamp, ld.software_version
+                     from lidar_data ld inner join lidar l
+                          inner join location loc
+                     where (loc.name = %s) and
+                           (ld.starttime >= %s) and
+                           (ld.stoptime <= %s) and
+                           (l.location_fk = loc.id) and
+                           (ld.location_fk = loc.id) and
+                           (ld.lidar_fk = l.id);""", (
+                        entry['pollynet_station'],
+                        entry['start_time'].strftime('%Y-%m-%d %H:%M:%S'),
+                        entry['stop_time'].strftime('%Y-%m-%d %H:%M:%S')
+                    )
+                  )
+
+        res = c.fetchall()
+
+        for item in res:
+            pollyDB_entry = {
+                'lidar': item[0],
+                'location': item[1],
+                'starttime': item[2],
+                'stoptime': item[3],
+                'last_update':
+                    datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'lambda': '355',
+                'image': entry['imgpath'],
+                'level': '0',
+                'info': 'ensemble trajectory plot that was reanalysed ' +
+                        'from HYSPLIT outputs',
+                'nc_zip_file': item[4],
+                'nc_zip_file_size': item[5],
+                'active': item[6],
+                'GDAS': '',
+                'GDAS_timestamp': '',
+                'lidar_ratio': '50',
+                'software_version': item[9],
+                'product_type': product_type,
+                'product_starttime': entry['start_time'],
+                'product_stoptime': entry['stop_time']
+            }
+
+            pollyDB_entryList.append(pollyDB_entry)
+
+    return pollyDB_entryList
+
+
+def setup_done_filelist(file, pollyDB_entryList):
+    """
+    Create the done_filelist.txt to enable the database scanning script to
+    write the data into the database.
+
+    Parameters
+    ----------
+    file: str
+    absolute file path of the done_filelist
+    pollyDB_entryList: list
+
+    History
+    -------
+    2019-10-08. First edition by Zhenping.
+    """
+
+    with open(file, 'w', encoding='utf-8') as fh:
+        for entry in pollyDB_entryList:
+            logger.info('write {image}, {loc}, {polly} to the done_filelist'.
+                        format(
+                            image=entry['image'],
+                            loc=entry['location'],
+                            polly=entry['lidar']
+                            )
+                        )
+            for key, value in entry.items():
+                fh.write('{key}={value}\n'.format(key=key, value=value))
+
+            fh.write('------\n')
+
+
+def scan_traj_into_sqliteDB():
+    """
+    scan and add trajectory plots into the sqlite3 Database.
+    """
 
     logger.info('Start to scan the backward trajectory results...')
 
     scanner = TrajScanner()
+
+    scanner.db_connect()
 
     scanner.db_create_table()
 
@@ -608,6 +802,31 @@ def main():
     scanner.db_insert_entry(entryList)
 
     scanner.db_close()
+
+
+def make_done_filelist_4_traj():
+    """
+    create the done_filelist for the trajectory plots.
+    """
+
+    logger.info('Start to scan the backward trajectory results')
+
+    scanner = TrajScanner()
+
+    filelist = scanner.scan_traj_files(datetime.datetime.now(),
+                                       elapse_time=datetime.timedelta(days=30))
+    fileInfoList = scanner.parse_traj_file(filelist)
+    entryList = scanner.setup_insert_entries(fileInfoList)
+
+    doneEntryList = convert_to_pollyDB_entry(entryList)
+    setup_done_filelist(config['DONE_FILELIST'], doneEntryList)
+
+
+def main():
+
+    # scan_traj_into_sqliteDB()
+
+    make_done_filelist_4_traj()
 
 
 if __name__ == "__main__":
