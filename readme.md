@@ -30,6 +30,8 @@ pip install -r requirements.txt
 
 ### configurations
 
+:point_right: **Remember you need to rename all the configuration files with removing the suffix of .sample!!!**
+
 **setup done_filelist**
 You need to configure the [`TRAJECTORY_ROOT`](./config/scanner_config.toml) [`POLLYAPP_CONFIG_FILE`](./config/scanner_config.toml) and [`DONE_FILELIST`](./config/scanner_config.toml), according to your own demands.
 
