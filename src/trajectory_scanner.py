@@ -638,7 +638,7 @@ def convert_to_pollyDB_entry(entryList):
         |stoptime         |20190926 05:57:00                         |
         |last_update      |20190930 20:35:07                         |
         |lambda           |355                                       |
-        |image            |PollyXT_CGE/2019/09/26/SIG.png            |
+        |image            |pictures/PollyXT_CGE/2019/09/26/SIG.png   |
         |level            |0                                         |
         |info             |Meteorological data from GDAS1 at evora   |
         |nc_zip_file      |201909/2019_09_26_Thursday_00_00_10.nc.zip|
@@ -740,7 +740,7 @@ def convert_to_pollyDB_entry(entryList):
                 'lambda': '355',
                 'image': os.path.relpath(
                     entry['imgpath'],
-                    config['TRAJECTORY_ROOT']),
+                    os.path.dirname(config['TRAJECTORY_ROOT'])),
                 'level': '0',
                 'info': 'ensemble trajectory plot that was reanalysed ' +
                         'from HYSPLIT outputs',
