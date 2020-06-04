@@ -1,4 +1,5 @@
 # Trajectory files Scanner for Picasso (only for internal usage)
+![License: CC-BY-NC-SA](https://img.shields.io/badge/license-CC--BY--NC--SA-blue)
 
 The repo helps to scan the trajectory figures to a local [**SQLite3**](https://www.sqlitetutorial.net/) database. In addtion, it can help create the **done_filelist.txt** for trajectory figures, which is essential for appending the trajectory figures into the **PollyNET** database.
 
