@@ -747,7 +747,7 @@ def convert_to_pollyDB_entry(entryList):
                 'nc_zip_file': item[4],
                 'nc_zip_file_size': item[5],
                 'active': item[6],
-                'GDAS': '',
+                'GDAS': '0',
                 'GDAS_timestamp': '',
                 'lidar_ratio': '50',
                 'software_version': item[9],
@@ -831,7 +831,7 @@ def make_done_filelist_4_traj():
     scanner = TrajScanner()
 
     filelist = scanner.scan_traj_files(datetime.datetime.now(),
-                                       elapse_time=datetime.timedelta(days=30))
+                                       elapse_time=datetime.timedelta(days=1000))
     fileInfoList = scanner.parse_traj_file(filelist)
     entryList = scanner.setup_insert_entries(fileInfoList)
 
