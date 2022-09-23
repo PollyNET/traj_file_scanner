@@ -2,7 +2,7 @@ autopep8==1.4.4
 certifi==2019.9.11
 mysqlclient==1.4.4
 pep8==1.7.1
-protobuf==3.10.0
+protobuf==3.18.3
 pycodestyle==2.5.0
 six==1.12.0
 toml==0.10.0
